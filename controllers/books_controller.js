@@ -1,7 +1,7 @@
 const express = require('express')
 const books = express.Router()
 const Books = require('../models/books.js')
-const seedData = require('../language/seed.js')
+const seedData = require('../books/seed.js')
 
 languages.get('/seed', (req, res) => {
     Books.insertMany(seedData)
@@ -9,6 +9,12 @@ languages.get('/seed', (req, res) => {
             res.json({
                 message: "Seed successful!"
             })
+            .then(res.status(200).json({
+                message: 'Seed successful'
+            }))
+            .catch(res.status(400).json({
+                message: 'Seed unsuccessful'
+            }))
         })
 })
 
@@ -36,9 +42,51 @@ languages.get('/:id', (req, res) => {
           })
 })
 
-
 // Update /books/:id
+router.put('/:id', (req, res) => {
+    db.Books.findByIdAndUpdate(req.params.id, req.body)
+    .then(() => {
+        res.redirect(`/books/${req.params.id}`)
+    })
+        .catch(err => {
+            console.log(err) 
+            res.json('error404')
+          })
+    })
 // Add /books
+router.post('/:id/books', (req, res) => {
+    console.log(req.body)
+    db.Books.findById(req.params.id)
+    .then(books => {
+        console.log(books)
+        db.Books.create(req.body)
+        .then(books => {
+            console.log("New book:")
+            console.log(books)
+            books.push(books.id)
+            books.save()
+            .then(() => {
+                res.redirect(`/books/${req.params.id}`)
+            })
+            .catch(err => {
+                console.log(err) 
+                res.json('error404')
+              })
+            })
+    })
+})
 // Delete /books/:id
+books.delete('/:id', (req, res) => {
+    Books.findByIdAndDelete(req.params.id) 
+      .then(deletedBooks => { 
+        res.status(303).redirect('/books')
+      })
+      .catch(err => {
+        console.log(err) 
+        res.json('error404')
+      })
+})
 
 module.exports = books
+
+
