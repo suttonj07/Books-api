@@ -3,20 +3,17 @@ const books = express.Router()
 const Books = require('../models/books.js')
 const seedData = require('../books/seed.js')
 
-languages.get('/seed', (req, res) => {
+books.get('/seed', (req, res) => {
     Books.insertMany(seedData)
         .then(books => {
             res.json({
                 message: "Seed successful!"
-            })
-            .then(res.status(200).json({
-                message: 'Seed successful'
-            }))
-            .catch(res.status(400).json({
-                message: 'Seed unsuccessful'
-            }))
+           
+     
         })
 })
+})
+
 
 // Index:
 books.get('/', (req, res) => {
@@ -31,7 +28,7 @@ books.get('/', (req, res) => {
 })
 
 // Show:
-languages.get('/:id', (req, res) => {
+books.get('/:id', (req, res) => {
     Books.findOne({ name: req.params.books .toLowerCase() })
         .then(foundBooks => {
             res.json(foundBooks)
@@ -42,19 +39,8 @@ languages.get('/:id', (req, res) => {
           })
 })
 
-// Update /books/:id
-router.put('/:id', (req, res) => {
-    db.Books.findByIdAndUpdate(req.params.id, req.body)
-    .then(() => {
-        res.redirect(`/books/${req.params.id}`)
-    })
-        .catch(err => {
-            console.log(err) 
-            res.json('error404')
-          })
-    })
 // Add /books
-router.post('/:id/books', (req, res) => {
+books.post('/:id/books', (req, res) => {
     console.log(req.body)
     db.Books.findById(req.params.id)
     .then(books => {
@@ -75,6 +61,18 @@ router.post('/:id/books', (req, res) => {
             })
     })
 })
+// Update /books/:id
+books.put('/:id', (req, res) => {
+    db.Books.findByIdAndUpdate(req.params.id, req.body)
+    .then(() => {
+        res.redirect(`/books/${req.params.id}`)
+    })
+        .catch(err => {
+            console.log(err) 
+            res.json('error404')
+          })
+    })
+
 // Delete /books/:id
 books.delete('/:id', (req, res) => {
     Books.findByIdAndDelete(req.params.id) 
@@ -90,3 +88,4 @@ books.delete('/:id', (req, res) => {
 module.exports = books
 
 
+     
